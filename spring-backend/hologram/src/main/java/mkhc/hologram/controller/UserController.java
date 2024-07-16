@@ -2,6 +2,8 @@ package mkhc.hologram.controller;
 
 import mkhc.hologram.dto.user.UserFetchDTO;
 import mkhc.hologram.dto.user.UserRegisterDTO;
+import mkhc.hologram.exception.user.EmailAlreadyUsed;
+import mkhc.hologram.exception.user.PhoneNumberAlreadyUsed;
 import mkhc.hologram.model.User;
 import mkhc.hologram.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,19 @@ public class UserController {
     @PostMapping
     @ResponseBody
     public ResponseEntity<Long> register(@RequestBody UserRegisterDTO userDTO) {
-        return new ResponseEntity<>(userService.save(userDTO.toModel()).getUserId(),HttpStatus.ACCEPTED);
+        long toReturn;
+        try{
+            toReturn=userService.save(userDTO.toModel()).getUserId();
+        } catch (RuntimeException e){
+            if(e instanceof EmailAlreadyUsed){
+                return ResponseEntity.badRequest().header("Error", "Email already used").build();
+            }
+            if(e instanceof PhoneNumberAlreadyUsed){
+                return ResponseEntity.badRequest().header("Error", "Phone number already used").build();
+            }
+            else return ResponseEntity.badRequest().header("Error", "Unknown error").build();
+        }
+        return new ResponseEntity<>(toReturn,HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/all")
@@ -33,9 +47,4 @@ public class UserController {
                 .toList();
     }
 
-//    @PostMapping("/photo")
-//    @ResponseBody
-//    public Optional<Long> updateProfilePicture(@RequestBody MultipartFile file) {
-//
-//    }
 }

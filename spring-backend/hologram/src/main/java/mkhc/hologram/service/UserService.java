@@ -1,5 +1,7 @@
 package mkhc.hologram.service;
 
+import mkhc.hologram.exception.user.EmailAlreadyUsed;
+import mkhc.hologram.exception.user.PhoneNumberAlreadyUsed;
 import mkhc.hologram.model.User;
 import mkhc.hologram.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +17,8 @@ public class UserService {
     private UserRepository userRepository;
 
     public User save(User user) {
-        return userRepository.save(user);
-    }
-
-    public User update(User user) {
+        if(userRepository.existsByEmail(user.getEmail())) throw new EmailAlreadyUsed();
+        if(userRepository.existsByPhoneNumber(user.getPhoneNumber())) throw new PhoneNumberAlreadyUsed();
         return userRepository.save(user);
     }
 
