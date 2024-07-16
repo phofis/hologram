@@ -1,13 +1,9 @@
 services:
-  postgres:
+  db:
     image: 'postgres:latest'
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      - 'POSTGRES_DB=hologram_db'
+      - 'POSTGRES_PASSWORD=hologram'
+      - 'POSTGRES_USER=hologram_user'
     ports:
       - '5432'
-  redis:
-    image: 'redis:latest'
-    ports:
-      - '6379'
