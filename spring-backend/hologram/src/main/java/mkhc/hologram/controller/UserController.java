@@ -28,10 +28,10 @@ public class UserController {
             toReturn=userService.save(userDTO.toModel()).getUserId();
         } catch (RuntimeException e){
             if(e instanceof EmailAlreadyUsed){
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already used");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already taken");
             }
             if(e instanceof PhoneNumberAlreadyUsed){
-                throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already used");
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already taken");
             }
             else throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
         }
@@ -53,9 +53,12 @@ public class UserController {
     public UserFetchDTO updateUser(@RequestBody User user) {
         User newUser = userService.findByEmail(user.getEmail());
         if(newUser != null && newUser.getUserId() != user.getUserId()){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already used");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already taken");
         }
-        //TODO finish this method
+        newUser = userService.findByPhoneNumber(user.getPhoneNumber());
+        if(newUser != null && newUser.getUserId() != user.getUserId()){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already taken");
+        }
         return user.toFetchDTO();
     }
 
