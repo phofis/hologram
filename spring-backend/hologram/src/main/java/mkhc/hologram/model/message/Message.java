@@ -22,12 +22,12 @@ import java.sql.Timestamp;
 public class Message {
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(nullable = false)
     private User user;
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "conversation_id", nullable = false)
+    @JoinColumn(nullable = false)
     private Conversation conversation;
 
     @Id

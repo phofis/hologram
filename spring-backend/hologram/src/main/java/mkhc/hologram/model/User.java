@@ -44,14 +44,6 @@ public class User {
     private Picture profilePicture;
 
     public UserFetchDTO toFetchDTO() {
-        UserFetchDTO userFetchDTO = new UserFetchDTO();
-        userFetchDTO.setFirstName(firstName);
-        userFetchDTO.setLastName(lastName);
-        userFetchDTO.setEmail(email);
-        userFetchDTO.setDateOfBirth(dateOfBirth);
-        userFetchDTO.setPassword(password);
-        userFetchDTO.setPhone(phoneNumber);
-        userFetchDTO.setProfilePicture(profilePicture);
-        return userFetchDTO;
+        return new UserFetchDTO(firstName, lastName, email, dateOfBirth, phoneNumber, profilePicture);
     }
 }

@@ -20,6 +20,9 @@ public class Conversation {
 
     private String emote;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    private ConversationTheme conversationTheme;
+
     @OneToOne
     private Picture profilePicture;
 

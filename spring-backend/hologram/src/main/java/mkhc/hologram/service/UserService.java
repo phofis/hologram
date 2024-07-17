@@ -29,4 +29,12 @@ public class UserService {
     public List<User> findAll() {
         return userRepository.findAll();
     }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public User findByPhoneNumber(String phoneNumber) {
+        return userRepository.findByPhoneNumber(phoneNumber);
+    }
 }
