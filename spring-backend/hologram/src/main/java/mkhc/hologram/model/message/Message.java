@@ -32,9 +32,10 @@ public class Message {
 
     @Id
     @Column(unique = true, nullable = false)
+    @ColumnDefault("current_timestamp")
     private Timestamp timestamp;
 
-    @Column(columnDefinition = "TEXT",nullable = false)
+    @Column(columnDefinition = "TEXT")
     private String text;
 
     @OneToOne(fetch = FetchType.EAGER)

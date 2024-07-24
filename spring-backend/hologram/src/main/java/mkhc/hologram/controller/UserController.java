@@ -1,6 +1,5 @@
 package mkhc.hologram.controller;
 
-import mkhc.hologram.dto.user.UserFetchDTO;
 import mkhc.hologram.dto.user.UserRegisterDTO;
 import mkhc.hologram.exception.user.EmailAlreadyUsed;
 import mkhc.hologram.exception.user.PhoneNumberAlreadyUsed;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -33,7 +33,7 @@ public class UserController {
             if(e instanceof PhoneNumberAlreadyUsed){
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already taken");
             }
-            else throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
         }
         return toReturn;
     }
@@ -43,33 +43,34 @@ public class UserController {
     public Optional<User> getUser(@PathVariable Long id) {
         Optional<User> user = userService.findById(id);
         if(user.isEmpty()){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User not found");
         }
         return user;
     }
 
     @PutMapping
     @ResponseBody
-    public UserFetchDTO updateUser(@RequestBody User user) {
+    public User updateUser(@RequestBody User user) {
         User newUser = userService.findByEmail(user.getEmail());
-        if(newUser != null && newUser.getUserId() != user.getUserId()){
+        if(newUser != null && !Objects.equals(newUser.getUserId(), user.getUserId())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already taken");
         }
         newUser = userService.findByPhoneNumber(user.getPhoneNumber());
-        if(newUser != null && newUser.getUserId() != user.getUserId()){
+        if(newUser != null && !Objects.equals(newUser.getUserId(), user.getUserId())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already taken");
         }
-        return user.toFetchDTO();
+        return user;
     }
 
     @GetMapping("/all")
     @ResponseBody
     public List<User> getAll() {
         return userService
-                .findAll();
+                .findAll()
 //                .stream()
 //                .map(User::toFetchDTO)
 //                .toList();
+                ;
     }
 
 }
