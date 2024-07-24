@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import mkhc.hologram.model.User;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -15,6 +16,7 @@ import java.sql.Timestamp;
 
 @Getter
 @Setter
+@Accessors(fluent = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
