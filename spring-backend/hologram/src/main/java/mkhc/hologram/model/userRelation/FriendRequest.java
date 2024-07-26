@@ -33,6 +33,7 @@ public class FriendRequest {
     @ColumnDefault("current_timestamp")
     private Timestamp timestamp;
 
-    @ColumnDefault("PENDING")
+    @ColumnDefault("0")
     private Status status;
+    //Default "0" means 0-th in order of Java enum, as Java enums are stored as ints. In this case 0 means PENDING and 1 means IGNORED.
 }

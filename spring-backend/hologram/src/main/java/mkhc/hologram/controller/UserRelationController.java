@@ -19,7 +19,7 @@ public class UserRelationController {
     private UserService userService;
 
     @PostMapping("/request")
-    public void friendRequest(@RequestParam Long senderId, @RequestParam Long receiverId) {
+    public void addFriendRequest(@RequestParam Long senderId, @RequestParam Long receiverId) {
         //POST https://localhost:8000/api/relation/request?senderId=1&receiverId=2
         User sender = userService.findById(senderId).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Sender not found within app database"));
         User receiver = userService.findById(receiverId).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Receiver not found within app database"));
@@ -75,15 +75,30 @@ public class UserRelationController {
         }
     }
 
+    @PutMapping("/ignore")
+    public void ignoreFriendRequest(@RequestParam Long senderId, @RequestParam Long receiverId) {
+        //PUT https://localhost:8000/api/relation/ignore?senderId=1&receiverId=2
+        User sender = userService.findById(senderId).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Sender not found within app database"));
+        User receiver = userService.findById(receiverId).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Receiver not found within app database"));
+        try {
+            userRelationsService.ignoreFriendRequest(sender, receiver);
+        } catch (RuntimeException e) {
+            if (e instanceof FriendRequestNotFound) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Friend request not found!");
+            }
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
+        }
+    }
+
     @DeleteMapping("/unfriend")
-    public void unfriend(@RequestParam Long senderId, @RequestParam Long receiverId) {
+    public void unfriendUser(@RequestParam Long senderId, @RequestParam Long receiverId) {
         //DELETE https://localhost:8000/api/relation/unfriend?senderId=1&receiverId=2
         User sender = userService.findById(senderId).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Sender not found within app database"));
         User receiver = userService.findById(receiverId).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Receiver not found within app database"));
         try {
             userRelationsService.deleteFriendship(sender, receiver);
         } catch (RuntimeException e) {
-            if (e instanceof FriendshipNotFound){
+            if (e instanceof FriendshipNotFound) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "You were not friends at the first place!");
             }
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
@@ -91,14 +106,14 @@ public class UserRelationController {
     }
 
     @PostMapping("/block")
-    public void block(@RequestParam Long senderId, @RequestParam Long receiverId) {
+    public void blockUser(@RequestParam Long senderId, @RequestParam Long receiverId) {
         //POST https://localhost:8000/api/relation/block?senderId=1&receiverId=2
         User sender = userService.findById(senderId).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Sender not found within app database"));
         User receiver = userService.findById(receiverId).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Receiver not found within app database"));
         try {
             userRelationsService.saveBlock(sender, receiver);
         } catch (RuntimeException e) {
-            if(e instanceof UserAlreadyBlocked){
+            if (e instanceof UserAlreadyBlocked) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "You already blocked this user!");
             }
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");
@@ -106,14 +121,14 @@ public class UserRelationController {
     }
 
     @DeleteMapping("/block")
-    public void unblock(@RequestParam Long senderId, @RequestParam Long receiverId) {
+    public void unblockUser(@RequestParam Long senderId, @RequestParam Long receiverId) {
         //DELETE https://localhost:8000/api/relation/block?senderId=1&receiverId=2
         User sender = userService.findById(senderId).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Sender not found within app database"));
         User receiver = userService.findById(receiverId).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Receiver not found within app database"));
         try {
             userRelationsService.deleteBlock(sender, receiver);
         } catch (RuntimeException e) {
-            if(e instanceof BlockNotFound){
+            if (e instanceof BlockNotFound) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "You have not blocked this user earlier!");
             }
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong!");

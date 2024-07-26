@@ -7,16 +7,19 @@ import mkhc.hologram.model.User;
 import mkhc.hologram.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Autowired
     private UserService userService;
 
@@ -38,28 +41,53 @@ public class UserController {
         return toReturn;
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping
     @ResponseBody
-    public Optional<User> getUser(@PathVariable Long id) {
-        Optional<User> user = userService.findById(id);
+    public User getUser(@RequestParam Long userId) {
+        Optional<User> user = userService.findById(userId);
         if(user.isEmpty()){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User not found");
         }
-        return user;
+        return user.get();
+    }
+
+    @GetMapping("/login")
+    @ResponseBody
+    public User login(@RequestParam String email, @RequestParam String password) {
+        if(userService.findByEmail(email).isEmpty()){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User not found");
+        }
+        if(userService.findByEmail(email).get().getPassword().equals(passwordEncoder.encode(password))){
+            return userService.findByEmail(email).get();
+        }
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "Provided password is incorrect");
     }
 
     @PutMapping
     @ResponseBody
     public User updateUser(@RequestBody User user) {
-        User newUser = userService.findByEmail(user.getEmail());
-        if(newUser != null && !Objects.equals(newUser.getUserId(), user.getUserId())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already taken");
+        if(userService.findById(user.getUserId()).isEmpty()){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "User not found within the app database");
         }
-        newUser = userService.findByPhoneNumber(user.getPhoneNumber());
-        if(newUser != null && !Objects.equals(newUser.getUserId(), user.getUserId())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already taken");
+
+        if(userService.findById(user.getUserId()).get().getEmail().equals(user.getEmail())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "New email must differentiate from older one");
         }
-        return user;
+        if(userService.findById(user.getUserId()).get().getPhoneNumber().equals(user.getPhoneNumber())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "New phone number must differentiate from older one");
+        }
+
+        try {
+            return userService.update(user);
+        } catch (RuntimeException e){
+            if(e instanceof EmailAlreadyUsed){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already taken");
+            }
+            if(e instanceof PhoneNumberAlreadyUsed){
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already taken");
+            }
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Something went wrong");
+        }
     }
 
     @GetMapping("/all")

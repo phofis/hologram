@@ -14,7 +14,7 @@ import lombok.Setter;
 public class Conversation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long conversationId;
+    private Long conversationId;
 
     private String customName;
 

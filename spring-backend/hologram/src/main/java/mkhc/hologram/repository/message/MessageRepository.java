@@ -1,4 +1,4 @@
-package mkhc.hologram.repository;
+package mkhc.hologram.repository.message;
 
 import mkhc.hologram.model.message.Message;
 import mkhc.hologram.model.message.MessageCompositeKey;

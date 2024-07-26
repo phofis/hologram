@@ -1,4 +1,4 @@
-package mkhc.hologram.repository;
+package mkhc.hologram.repository.message;
 
 import mkhc.hologram.model.message.MyFile;
 import org.springframework.data.jpa.repository.JpaRepository;

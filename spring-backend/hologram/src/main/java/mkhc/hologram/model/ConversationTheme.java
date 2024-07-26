@@ -9,6 +9,6 @@ import jakarta.persistence.Id;
 public class ConversationTheme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long conversationThemeId;
+    private Long conversationThemeId;
     private String conversationThemeName;
 }

@@ -14,7 +14,7 @@ import lombok.Setter;
 public class Picture {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long pictureId;
+    private Long pictureId;
 
     @Column(nullable = false)
     private String fileName;
